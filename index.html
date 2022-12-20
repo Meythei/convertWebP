@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<!-- saved from url=(0050)https://www.lv8.jp/sample/maruyamas/study/CNVwebP/ -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>convert webp</title>
+  <link rel="stylesheet" type="text/css" href="./assets/style.css" media="all">
+</head>
+<body>
+  <main id="convert_webp">
+    <h1>WebP変換</h1>
+    <form id="form">
+      <div id="preview"></div>
+      <label for="fileInput" class="select_file">
+      ファイルを選択して下さい
+      <input type="file" id="fileInput" accept="image/*">
+      </label>
+      <a id="download">download</a>
+      <button type="submit">Submit</button>
+    </form>
+  </main>
+  <script>
+
+    let dataUrl;
+
+    const form = document.getElementById('form');
+
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files.length === 0) {
+        return;
+      }
+      const file = fileInput.files[0];
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        const img = new Image();
+        img.src = reader.result;
+        img.onload = () => {
+          
+          const canvas = document.createElement('canvas');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0);
+
+          dataUrl = canvas.toDataURL('image/webp');
+          // 変換後のデータをプレビュー
+          const preview_slot = document.getElementById('preview');
+          preview_slot.innerHTML = `<img src="${dataUrl}">`;
+          
+          const download_link = document.getElementById('download');
+          download_link.href = dataUrl;
+          download_link.download = 'converted.webp';
+        };
+      };
+
+    });
+    
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const fileInput = document.getElementById('fileInput');
+      if (fileInput.files.length === 0) {
+        return;
+      }
+
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', '/upload');
+      xhr.setRequestHeader('Content-Type', 'application/octet-stream');
+      xhr.send(dataUrl);
+    });
+
+  </script>
+
+</body></html>
